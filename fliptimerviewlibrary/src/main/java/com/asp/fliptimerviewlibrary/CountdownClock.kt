@@ -11,6 +11,10 @@ import android.view.View
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.view_countdown_clock_digit.view.*
 import kotlinx.android.synthetic.main.view_simple_clock.view.*
+import org.joda.time.DurationFieldType
+import org.joda.time.Period
+import org.joda.time.PeriodType
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -91,7 +95,8 @@ class CountDownClock : LinearLayout {
                     hasCalledAlmostFinished = true
                     countdownListener?.countdownAboutToFinish()
                 }
-                setCountDownTime(millisUntilFinished)
+//                setCountDownTime(millisUntilFinished)
+                setCountDownTimeNew(millisUntilFinished)
             }
 
             override fun onFinish() {
@@ -130,6 +135,122 @@ class CountDownClock : LinearLayout {
         val minutesString = minutes.toString()
         val secondsString = seconds.toString()
 
+
+        when {
+            daysString.length == 2 -> {
+                firstDigitDays.animateTextChange((daysString[0].toString()))
+                secondDigitDays.animateTextChange((daysString[1].toString()))
+            }
+            daysString.length == 1 -> {
+                firstDigitDays.animateTextChange(("0"))
+                secondDigitDays.animateTextChange((daysString[0].toString()))
+            }
+            else -> {
+                firstDigitDays.animateTextChange(("3"))
+                secondDigitDays.animateTextChange(("0"))
+            }
+        }
+
+        when {
+            hoursString.length == 2 -> {
+                firstDigitHours.animateTextChange((hoursString[0].toString()))
+                secondDigitHours.animateTextChange((hoursString[1].toString()))
+            }
+            hoursString.length == 1 -> {
+                firstDigitHours.animateTextChange(("0"))
+                secondDigitHours.animateTextChange((hoursString[0].toString()))
+            }
+            else -> {
+                firstDigitHours.animateTextChange(("1"))
+                secondDigitHours.animateTextChange(("1"))
+            }
+        }
+
+        when {
+            minutesString.length == 2 -> {
+                firstDigitMinute.animateTextChange((minutesString[0].toString()))
+                secondDigitMinute.animateTextChange((minutesString[1].toString()))
+            }
+            minutesString.length == 1 -> {
+                firstDigitMinute.animateTextChange(("0"))
+                secondDigitMinute.animateTextChange((minutesString[0].toString()))
+            }
+            else -> {
+                firstDigitMinute.animateTextChange(("5"))
+                secondDigitMinute.animateTextChange(("9"))
+            }
+        }
+        when {
+            secondsString.length == 2 -> {
+                firstDigitSecond.animateTextChange((secondsString[0].toString()))
+                secondDigitSecond.animateTextChange((secondsString[1].toString()))
+            }
+            secondsString.length == 1 -> {
+                firstDigitSecond.animateTextChange(("0"))
+                secondDigitSecond.animateTextChange((secondsString[0].toString()))
+            }
+            else -> {
+                firstDigitSecond.animateTextChange((secondsString[secondsString.length - 2].toString()))
+                secondDigitSecond.animateTextChange((secondsString[secondsString.length - 1].toString()))
+            }
+        }
+    }
+
+    private fun setCountDownTimeNew(timeToStart: Long) {
+        val fields = PeriodType.forFields(
+            arrayOf(
+                DurationFieldType.years(),
+                DurationFieldType.months(),
+                DurationFieldType.days(),
+                DurationFieldType.hours(),
+                DurationFieldType.minutes(),
+                DurationFieldType.seconds()
+            )
+        )
+        val period: Period =
+            Period(System.currentTimeMillis(), System.currentTimeMillis() + timeToStart)
+                .normalizedStandard(fields)
+
+        val years = period.years
+        val months = period.months
+        val days = period.days
+        val hours = period.hours
+        val minutes = period.minutes
+        val seconds = period.seconds
+
+        var yearsString = years.toString()
+        var monthString = months.toString()
+        var daysString = days.toString()
+        var hoursString = hours.toString()
+        var minutesString = minutes.toString()
+        var secondsString = seconds.toString()
+
+        if (years > 0) {
+            secondsString = hoursString
+            minutesString = daysString
+            hoursString = monthString
+            daysString = yearsString
+
+            tvFirstBlockTitle.setText("Years")
+            tvSecondBlockTitle.setText("Months")
+            tvThirdBlockTitle.setText("Days")
+            tvFourthBlockTitle.setText("Hours")
+        } else if (months > 0) {
+            secondsString = minutesString
+            minutesString = hoursString
+            hoursString = daysString
+            daysString = monthString
+
+            tvFirstBlockTitle.setText("Months")
+            tvSecondBlockTitle.setText("Days")
+            tvThirdBlockTitle.setText("Hours")
+            tvFourthBlockTitle.setText("Mins")
+        } else {
+            tvFirstBlockTitle.setText("Days")
+            tvSecondBlockTitle.setText("Hours")
+            tvThirdBlockTitle.setText("Mins")
+            tvFourthBlockTitle.setText("Secs")
+        }
 
         when {
             daysString.length == 2 -> {
